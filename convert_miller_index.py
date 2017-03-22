@@ -46,20 +46,20 @@ def stridx2intidx(stridx):
     return intidx
     
 def ratioconvert(numerator,denominator,tolerance):
-    '''Convert a ratio of two floats into the ratio of two integers.
+    '''Convert a ratio of two float into the ratio of two simpliest integer.
     Tolerance means the tolerance of the bias bewteen these two ratios.  
     '''
-    intden = int(round(1 / tolerance))
-    intnum = int((float(numerator) / float(denominator)) * intden) 
     if (abs(numerator) <= 1E-15)&(abs(denominator) <= 1E-15):
         return [0,0]
     elif abs(numerator) <= 1E-15:
-        return [0,intden]
-    elif abs(denominator) <= 1E-15:
-        intnum = int(float(numerator) * intden)
-        return [intnum,0]
+        return [0,int(denominator/abs(denominator))]
+    elif abs(numerator) <= 1E-15:
+        return [int(numerator/abs(numerator)),0]
     else:
-        return [intnum,intden]
+        intden = int(round(1 / tolerance))
+        intnum = int((float(numerator) / float(denominator)) * intden) 
+        gcd_numden = gcd(intden,intnum)
+        return [intnum/gcd_numden,intden/gcd_numden]
     
 def absvec(abc):
     '''Make the coordinates of vector positive
@@ -85,12 +85,16 @@ def hkl2uvw(hkl,abc,tolerance):
     #We have already solve the value of v/u and w/u
     #Code below aims at turn u,v,w into their smallest integers
     u2 = ratioconvert(u1,v1,tolerance)[0]
-    v2 = ratioconvert(u1,v1,tolerance)[1]
+    v2u = ratioconvert(u1,v1,tolerance)[1]
+    v2w = ratioconvert(w1,v1,tolerance)[1]
     w2 = ratioconvert(w1,v1,tolerance)[0]
-    gcd_uvw = gcd(gcd(abs(u2),abs(v2)),abs(w2))
-    u = u2 / gcd_uvw
-    v = v2 / gcd_uvw
-    w = w2 / gcd_uvw
+    u3 = u2 * v2w
+    v3 = v2u * v2w
+    w3 = w2 * v2u
+    gcd_uvw = gcd(gcd(abs(u3),abs(v3)),abs(w3))
+    u = u3 / gcd_uvw
+    v = v3 / gcd_uvw
+    w = w3 / gcd_uvw
     return absvec([u,v,w])
 
 def uvw2hkl(uvw,abc,tolerance):
@@ -105,12 +109,16 @@ def uvw2hkl(uvw,abc,tolerance):
     #We have already solve the value of h/k and l/k
     #Code below aims at turn h,k,l into their smallest integers
     h2 = ratioconvert(h1,k1,tolerance)[0]
-    k2 = ratioconvert(h1,k1,tolerance)[1]
+    k2h = ratioconvert(h1,k1,tolerance)[1]
+    k2l = ratioconvert(l1,k1,tolerance)[1]
     l2 = ratioconvert(l1,k1,tolerance)[0]
-    gcd_hkl = gcd(gcd(abs(h2),abs(k2)),abs(l2))
-    h = h2 / gcd_hkl
-    k = k2 / gcd_hkl
-    l = l2 / gcd_hkl
+    h3 = h2 * k2l
+    k3 = k2h * k2l
+    l3 = l2 * k2h
+    gcd_hkl = gcd(gcd(abs(h3),abs(k3)),abs(l3))
+    h = h3 / gcd_hkl
+    k = k3 / gcd_hkl
+    l = l3 / gcd_hkl
     return absvec([h,k,l])
 
 if args.miller :
