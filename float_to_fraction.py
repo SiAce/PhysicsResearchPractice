@@ -7,24 +7,21 @@ Created on Tue Mar 21 17:52:37 2017
 a = -0.1312312312312312312312312312312
 print int(a/abs(a))
 
-def float2fraction(num='numerator',den='denominator',tol='tolerance'):
-    if (abs(num) <= 1E-15)&(abs(den) <= 1E-15):
+def ratioconvert(numerator,denominator,tolerance):
+    '''Convert a ratio of two floats into the ratio of two integers.
+    Tolerance means the tolerance of the bias bewteen these two ratios.  
+    '''
+    intden = int(round(1 / tolerance))
+    intnum = int((float(numerator) / float(denominator)) * intden) 
+    if (abs(numerator) <= 1E-15)&(abs(denominator) <= 1E-15):
         return [0,0]
-    elif abs(num) <= 1E-15:
-        return [0,int(den/abs(den))]
-    elif abs(num) <= 1E-15:
-        return [int(num/abs(num)),0]
+    elif abs(numerator) <= 1E-15:
+        return [0,intden]
+    elif abs(denominator) <= 1E-15:
+        intnum = int(float(numerator) * intden)
+        return [intnum,0]
     else:
-        intden = int(round(1 / tol))
-        intnum = int((float(num) / float(den)) * intden) 
-        gcd_numden = gcd(intden,intnum)
-        return [intnum/gcd_numden,intden/gcd_numden]
+        return [intnum,intden]    
     
-def gcd(a,b): #calculate the Greatest Common Divisor of a and b
-    while (b != 0) :
-        c = a % b
-        a = b
-        b = c
-    return a
-    
-print float2fraction(0,-23.23,2e-5)
+print ratioconvert(1.2323,1e-16,1e-5)
+print ratioconvert(4.2323,1e-16,1e-5)
