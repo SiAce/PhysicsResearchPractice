@@ -7,22 +7,10 @@ Created on Wed Mar 15 18:44:03 2017
 import ase
 import ase.io.vasp as vp
 import numpy as np
-import argparse
 
-tolerance = 1e-2     #the tolerance of 
+tolerance = 1e-5 #the tolerance of 
 
-
-parser = argparse.ArgumentParser(description='Convert miller index.')
-parser.add_argument('index', metavar='INDEX', type=str,
-                    help='the index can either be miller index or orientation index')
-parser.add_argument('poscar', metavar='POSCAR', type=str,
-                    help='poscar file where basis vectors come from')
-parser.add_argument('-m', dest='miller', action='store_true',                    
-                    help='convert miller index to orientation index')
-parser.add_argument('-i', dest='orientation', action='store_true',
-                    help='convert orientation index to miller index')
-args = parser.parse_args()
-abc = ase.Atoms.get_cell(vp.read_vasp(args.poscar))
+abc = ase.Atoms.get_cell(vp.read_vasp('POSCAR'))
 
 def gcd(a,b): 
     '''Calculate the Greatest Common Divisor of a and b
@@ -64,7 +52,7 @@ def ratioconvert(numerator,denominator,tolerance):
     else:
         intnum = int(round(float(numerator) / float(denominator),multiple - scale) * intden) 
         return [intnum,intden]
-    
+            
 def absvec(abc):
     '''Make the coordinates of vector positive
     '''
@@ -117,7 +105,4 @@ def uvw2hkl(uvw,abc,tolerance):
     l = l2 / gcd_hkl
     return absvec([h,k,l])
 
-if args.miller :
-    print hkl2uvw(stridx2intidx(args.index),abc,tolerance)
-if args.orientation :
-    print tuple(uvw2hkl(stridx2intidx(args.index),abc,tolerance))
+print hkl2uvw([1,2,3],abc,tolerance)
